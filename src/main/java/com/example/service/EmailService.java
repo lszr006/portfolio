@@ -1,27 +1,24 @@
 package com.example.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${RESEND_API_KEY:}")
+    private String apiKey;
 
-    @Value("${contact.email.to:}")
+    @Value("${CONTACT_EMAIL:}")
     private String toAddress;
 
-    @Value("${spring.mail.username:}")
-    private String fromAddress;
-
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-
     public boolean isConfigured() {
-        return fromAddress != null && !fromAddress.isBlank()
+        return apiKey != null && !apiKey.isBlank()
             && toAddress != null && !toAddress.isBlank();
     }
 
@@ -29,12 +26,42 @@ public class EmailService {
         if (!isConfigured()) {
             throw new IllegalStateException("Email is not configured");
         }
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromAddress);
-        message.setTo(toAddress);
-        message.setSubject("Portfolio Contact: " + name);
-        message.setText("From: " + name + " (" + fromEmail + ")\n\n" + messageBody);
-        message.setReplyTo(fromEmail);
-        mailSender.send(message);
+
+        String json = """
+            {
+                "from": "Portfolio Contact <onboarding@resend.dev>",
+                "to": "%s",
+                "subject": "Portfolio Contact: %s",
+                "text": "From: %s (%s)\\n\\n%s",
+                "reply_to": "%s"
+            }
+            """.formatted(toAddress, escape(name), escape(name), escape(fromEmail), escape(messageBody), escape(fromEmail));
+
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.resend.com/emails"))
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                throw new RuntimeException("Resend API error: " + response.body());
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Email send interrupted", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
+    private String escape(String input) {
+        return input.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "");
     }
 }

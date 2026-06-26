@@ -43,7 +43,7 @@ public class PortfolioController {
                               Model model) {
         if (!emailService.isConfigured()) {
             model.addAttribute("error", true);
-            model.addAttribute("errorMsg", "Email is not configured yet. Please set MAIL_USERNAME and MAIL_PASSWORD.");
+            model.addAttribute("errorMsg", "Email is not configured yet. Please set RESEND_API_KEY and CONTACT_EMAIL.");
             return "contact";
         }
         try {
