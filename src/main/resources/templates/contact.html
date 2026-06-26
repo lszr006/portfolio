@@ -17,7 +17,8 @@
             Message sent successfully! I'll get back to you soon.
         </div>
         <div th:if="${error}" class="alert alert-error">
-            Something went wrong. Please try again or email me directly.
+            <span th:if="${errorMsg}" th:text="${errorMsg}"></span>
+            <span th:unless="${errorMsg}">Something went wrong. Please try again or email me directly.</span>
         </div>
         <form method="post" action="/contact">
             <div class="form-group">

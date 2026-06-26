@@ -41,12 +41,18 @@ public class PortfolioController {
                               @RequestParam("email") String email,
                               @RequestParam("message") String message,
                               Model model) {
+        if (!emailService.isConfigured()) {
+            model.addAttribute("error", true);
+            model.addAttribute("errorMsg", "Email is not configured yet. Please set MAIL_USERNAME and MAIL_PASSWORD.");
+            return "contact";
+        }
         try {
             emailService.sendContactEmail(name, email, message);
             model.addAttribute("success", true);
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", true);
+            model.addAttribute("errorMsg", "Failed to send message. Please try again later.");
         }
         return "contact";
     }
