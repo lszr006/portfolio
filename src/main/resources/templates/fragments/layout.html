@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<nav th:fragment="nav(activePage)">
+    <div class="nav-container">
+        <a href="/" class="logo">Portfolio</a>
+        <ul class="nav-links">
+            <li><a href="/" th:classappend="${activePage == 'home' ? 'active' : ''}">Home</a></li>
+            <li><a href="/about" th:classappend="${activePage == 'about' ? 'active' : ''}">About</a></li>
+            <li><a href="/projects" th:classappend="${activePage == 'projects' ? 'active' : ''}">Projects</a></li>
+            <li><a href="/contact" th:classappend="${activePage == 'contact' ? 'active' : ''}">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<footer th:fragment="footer">
+    <p>&copy; 2026 Portfolio. Built with Spring Boot &amp; Thymeleaf.</p>
+</footer>
+
+</html>
