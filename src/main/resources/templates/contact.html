@@ -33,12 +33,26 @@
                 <label for="message">Message</label>
                 <textarea id="message" name="message" placeholder="What would you like to say?" required></textarea>
             </div>
-            <button type="submit" class="btn">Send Message</button>
+            <button type="submit" class="btn" id="submitBtn">
+                <span id="btnText">Send Message</span>
+                <span id="btnSpinner" class="spinner" style="display:none;"></span>
+            </button>
         </form>
     </div>
 </section>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script>
+document.querySelector('form').addEventListener('submit', function() {
+    var btn = document.getElementById('submitBtn');
+    var text = document.getElementById('btnText');
+    var spinner = document.getElementById('btnSpinner');
+    btn.disabled = true;
+    text.textContent = 'Sending...';
+    spinner.style.display = 'inline-block';
+});
+</script>
 
 </body>
 </html>
