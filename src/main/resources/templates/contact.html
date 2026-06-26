@@ -44,6 +44,13 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
+var hasAlert = document.querySelector('.alert');
+if (hasAlert) {
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = false;
+    document.getElementById('btnText').textContent = 'Send Message';
+    document.getElementById('btnSpinner').style.display = 'none';
+}
 document.querySelector('form').addEventListener('submit', function() {
     var btn = document.getElementById('submitBtn');
     var text = document.getElementById('btnText');
