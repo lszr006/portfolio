@@ -45,6 +45,7 @@ public class PortfolioController {
             emailService.sendContactEmail(name, email, message);
             model.addAttribute("success", true);
         } catch (Exception e) {
+            e.printStackTrace();
             model.addAttribute("error", true);
         }
         return "contact";
